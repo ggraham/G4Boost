@@ -112,7 +112,7 @@ def findall(seq, search):
     return count
 
 def initialize_dataFrame():
-    header=["seq", "seq_length", "g4motif", "length", "loops", "G-quartet", "maxlbase", "minlbase", "G", "C", "GG", "CC"]
+    header=["seq", "length", "g4motif", "len", "maxgstem", "maxgbase", "maxlbase", "minlbase", "G", "C", "GG", "CC"]
     data_dict={}
     for h in header:
         data_dict[h]=[]
@@ -137,10 +137,10 @@ def topology(reg, seq):
 def update_dataFrame(features, reg, seq, ref):
     [test, length, maxgstem, maxgbase, maxlbase, minlbase] = topology(reg, seq)
     features['g4motif'].append(test)
-    features['length'].append(length)
-    features['seq_length'].append(len(ref))
-    features['loops'].append(maxgstem)
-    features['G-quartet'].append(maxgbase)
+    features['len'].append(length)
+    features['length'].append(len(ref))
+    features['maxgstem'].append(maxgstem)
+    features['maxgbase'].append(maxgbase)
     features['maxlbase'].append(maxlbase)
     features['minlbase'].append(minlbase)
     features['G'].append(int(findall(ref,'G')*100/len(ref)))
@@ -255,7 +255,7 @@ classifier.load_model(args.classifier)
 #classifier = pickle.load(open(args.classifier, 'rb'))
 #regressor = pickle.load(open(args.regressor, 'rb'))
 #selected='length seq_length G-quartet loops maxlbase minlbase G C GG CC'.split(' ')
-selected=["seq_length", "length", "loops", "G-quartet", "maxlbase", "minlbase", "G", "C", "GG", "CC"]
+selected=["length", "len", "maxgstem", "maxgbase", "maxlbase", "minlbase", "G", "C", "GG", "CC"]
 features=pd.DataFrame.from_dict(features)
 X_test = features[selected]
 #X_test=xgb.DMatrix(X_test)
@@ -265,7 +265,7 @@ mfe_pred = regressor.predict(X_test)
 features['g4_pred']=g4_pred
 features['g4_prob']=g4_pred_proba
 features['mfe_pred']=mfe_pred
-features['loops']=[l-1 for l in features['loops']]
+features['maxgstem']=[l-1 for l in features['maxgstem']]
 
 if args.fasta != '-': output= args.fasta+'.g4scores.csv'
 else: output = 'G4Boost_quadruplexes.g4.csv'
